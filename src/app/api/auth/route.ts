@@ -70,28 +70,12 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({ token: token ?? null });
 
-    const upstreamHeaders = upstreamResponse.headers as Headers & {
-      getSetCookie?: () => string[];
-    };
-
-    const upstreamSetCookies =
-      upstreamHeaders.getSetCookie?.() ??
-      (upstreamResponse.headers.get("set-cookie")
-        ? [upstreamResponse.headers.get("set-cookie") as string]
-        : []);
-
-    for (const cookieValue of upstreamSetCookies) {
-      response.headers.append("set-cookie", cookieValue);
-    }
-
     if (token) {
-      response.cookies.set("planka_jwt", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      const secureFlag =
+        process.env.NODE_ENV === "production" ? "; Secure" : "";
+      const cookieValue =
+        `planka_jwt=${token}; Max-Age=31536000; Path=/; HttpOnly; SameSite=Lax${secureFlag}`;
+      response.headers.append("Set-Cookie", cookieValue);
     }
 
     return response;
