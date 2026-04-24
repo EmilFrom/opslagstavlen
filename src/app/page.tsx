@@ -53,9 +53,13 @@ export default function LoginPage() {
             <span className="text-sm font-semibold text-slate-700">Brugernavn</span>
             <input
               type="text"
+              name="username"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               autoComplete="username"
+              autoCapitalize="off"
+              spellCheck="false"
+              enterKeyHint="next"
               required
               className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4"
               placeholder="Indtast brugernavn"
@@ -66,9 +70,11 @@ export default function LoginPage() {
             <span className="text-sm font-semibold text-slate-700">Adgangskode</span>
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
+              enterKeyHint="go"
               required
               className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4"
               placeholder="••••••••"
