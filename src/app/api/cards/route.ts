@@ -33,12 +33,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const payloadBody = {
-    boardId: body.boardId,
+  const payloadBody: Record<string, string> = {
     listId: body.listId,
     name: body.name,
-    description: body.description ?? "",
   };
+
+  if (body.description && body.description.trim() !== "") {
+    payloadBody.description = body.description;
+  }
 
   const plankaUrl = `${PLANKA_BASE_URL}/api/cards`;
 
