@@ -33,34 +33,47 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const payloadBody: Record<string, string> = {
-    listId: body.listId,
+  const payload: Record<string, string | number> = {
     name: body.name,
+    position: 65536,
+    type: "project",
   };
 
   if (body.description && body.description.trim() !== "") {
-    payloadBody.description = body.description;
+    payload.description = body.description;
   }
 
-  const plankaUrl = `${PLANKA_BASE_URL}/api/cards`;
+  if (body.boardId) {
+    payload.boardId = body.boardId;
+  }
+
+  const upstreamUrl = `${PLANKA_BASE_URL}/api/lists/${body.listId}/cards`;
+
+  console.log("[PROXY OUTGOING] POST", upstreamUrl, payload);
 
   try {
-    const response = await fetch(plankaUrl, {
+    const response = await fetch(upstreamUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payloadBody),
+      body: JSON.stringify(payload),
       cache: "no-store",
     });
 
-    const status = response.status;
     const rawText = await response.text();
 
+    console.log("[PROXY INCOMING] Status:", response.status, rawText);
+
     if (!response.ok) {
-      return NextResponse.json({ error: rawText }, { status });
+      return new NextResponse(rawText, {
+        status: response.status,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+      });
     }
 
     try {
