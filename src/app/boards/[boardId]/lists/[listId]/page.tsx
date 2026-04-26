@@ -172,7 +172,7 @@ export default function ListDetailPage() {
   };
 
   return (
-    <main className="relative h-full overflow-y-auto px-4 pb-24 pt-5">
+    <main className="relative h-full overflow-y-auto px-2 pb-24 pt-5 sm:px-4 md:px-6">
       <header className="mb-6 flex items-center gap-3">
         <button
           type="button"

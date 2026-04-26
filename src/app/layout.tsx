@@ -38,11 +38,9 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="min-h-full bg-gradient-to-br from-rose-50 via-sky-50 to-blue-100 text-slate-900 font-sans">
-        <div className="mx-auto flex h-[100dvh] w-full max-w-md flex-col overflow-hidden px-4 py-4 md:max-w-2xl lg:max-w-4xl">
-          <div className="relative h-full overflow-hidden rounded-3xl border border-white/50 bg-white/60 shadow-xl backdrop-blur-xl">
-            {children}
-          </div>
+      <body className="min-h-screen bg-gradient-to-br from-rose-50 via-sky-50 to-blue-100 text-slate-900 font-sans">
+        <div className="min-h-screen pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+          {children}
         </div>
       </body>
     </html>

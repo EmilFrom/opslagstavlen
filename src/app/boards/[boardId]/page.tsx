@@ -101,7 +101,7 @@ export default function BoardDetailPage() {
   const displayLists = preferredLists.length === 2 ? preferredLists : validLists;
 
   return (
-    <main className="relative flex h-full flex-col overflow-hidden px-4 pb-6 pt-5">
+    <main className="relative flex h-full flex-col overflow-hidden px-2 pb-6 pt-5 sm:px-4 md:px-6">
       <header className="mb-6 flex items-center gap-3">
         <button
           type="button"
