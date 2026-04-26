@@ -42,15 +42,15 @@ export default function LoginPage() {
 
   return (
     <main className="flex h-full items-center justify-center px-4">
-      <section className="w-full rounded-3xl border border-white/40 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
+      <section className="w-full rounded-3xl border border-white/40 bg-white/10 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/70">
         <header className="mb-6 space-y-2">
-          <p className="text-sm font-medium text-slate-700/90">Velkommen tilbage</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Opslagstavlen</h1>
+          <p className="text-sm font-medium text-slate-700/90 dark:text-gray-400">Velkommen tilbage</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Opslagstavlen</h1>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-700">Brugernavn</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">Brugernavn</span>
             <input
               type="text"
               name="username"
@@ -61,13 +61,13 @@ export default function LoginPage() {
               spellCheck="false"
               enterKeyHint="next"
               required
-              className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4"
+              className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
               placeholder="Indtast brugernavn"
             />
           </label>
 
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-slate-700">Adgangskode</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">Adgangskode</span>
             <input
               type="password"
               name="password"
@@ -76,13 +76,13 @@ export default function LoginPage() {
               autoComplete="current-password"
               enterKeyHint="go"
               required
-              className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4"
+              className="h-13 w-full rounded-2xl border border-white/60 bg-white/80 px-4 text-base text-slate-900 outline-none ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
               placeholder="••••••••"
             />
           </label>
 
           {errorMessage ? (
-            <p className="rounded-2xl border border-rose-200 bg-rose-50/90 px-3 py-2 text-sm font-medium text-rose-700">
+            <p className="rounded-2xl border border-rose-200 bg-rose-50/90 px-3 py-2 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
               {errorMessage}
             </p>
           ) : null}
@@ -90,7 +90,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 inline-flex h-13 w-full items-center justify-center rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60"
+            className="mt-2 inline-flex h-13 w-full items-center justify-center rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60 dark:bg-white/10 dark:text-white"
           >
             {isSubmitting ? "Logger ind..." : "Log ind"}
           </button>

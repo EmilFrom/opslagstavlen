@@ -177,28 +177,28 @@ export default function ListDetailPage() {
         <button
           type="button"
           onClick={() => router.push(`/boards/${boardId}`)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/70 text-slate-700 shadow-sm backdrop-blur"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/70 text-slate-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
           aria-label="Tilbage til kategorier"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Kategori</p>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{listName}</h1>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-300">Kategori</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{listName}</h1>
         </div>
       </header>
 
       {isLoading ? (
         <div className="space-y-3">
-          <div className="h-32 animate-pulse rounded-2xl bg-white/70" />
-          <div className="h-32 animate-pulse rounded-2xl bg-white/70" />
+          <div className="h-32 animate-pulse rounded-2xl bg-white/70 dark:bg-white/10" />
+          <div className="h-32 animate-pulse rounded-2xl bg-white/70 dark:bg-white/10" />
         </div>
       ) : errorMessage ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
           {errorMessage}
         </div>
       ) : cards.length === 0 ? (
-        <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700">
+        <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700 dark:border-white/10 dark:bg-neutral-800/60 dark:text-gray-300">
           Ingen opgaver i denne kategori endnu.
         </div>
       ) : (
@@ -220,7 +220,7 @@ export default function ListDetailPage() {
       <button
         type="button"
         onClick={() => setIsCreateOpen(true)}
-        className="fixed bottom-8 right-8 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_14px_30px_rgba(15,23,42,0.35)] transition active:scale-[0.98]"
+        className="fixed bottom-8 right-8 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_14px_30px_rgba(15,23,42,0.35)] transition active:scale-[0.98] dark:border dark:border-white/10 dark:bg-neutral-700 dark:text-gray-100"
         aria-label="Nyt opslag"
       >
         <Plus className="h-7 w-7" />
@@ -229,14 +229,14 @@ export default function ListDetailPage() {
       <AnimatePresence>
         {isCreateOpen ? (
           <motion.div
-            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm dark:bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsCreateOpen(false)}
           >
             <motion.div
-              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-3xl border border-white/60 bg-white/90 px-5 pb-8 pt-5 shadow-2xl backdrop-blur-xl md:max-w-2xl"
+              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-3xl border border-white/60 bg-white/90 px-5 pb-8 pt-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/95 md:max-w-2xl"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -247,11 +247,11 @@ export default function ListDetailPage() {
               aria-label="Opret opslag"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">Nyt opslag</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Nyt opslag</h2>
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-slate-700"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-slate-700 dark:border dark:border-white/10 dark:bg-neutral-700 dark:text-gray-300"
                   aria-label="Luk"
                 >
                   <X className="h-5 w-5" />
@@ -260,30 +260,30 @@ export default function ListDetailPage() {
 
               <div className="space-y-3">
                 <label className="block space-y-1.5">
-                  <span className="text-sm font-medium text-slate-700">Titel</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-gray-300">Titel</span>
                   <textarea
                     value={createTitle}
                     onChange={(event) => setCreateTitle(event.target.value)}
                     rows={4}
-                    className="w-full min-h-[120px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-lg text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4"
+                    className="w-full min-h-[120px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-lg text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
                     placeholder="Skriv titel..."
                   />
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="text-sm font-medium text-slate-700">Beskrivelse</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-gray-300">Beskrivelse</span>
                   <textarea
                     value={createDescription}
                     onChange={(event) => setCreateDescription(event.target.value)}
                     rows={6}
-                    className="w-full min-h-[160px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-base text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4"
+                    className="w-full min-h-[160px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-base text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
                     placeholder="Skriv beskrivelse..."
                   />
                 </label>
               </div>
 
               {createError ? (
-                <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-3 py-2 text-sm font-medium text-rose-700">
+                <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-3 py-2 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
                   {createError}
                 </p>
               ) : null}
@@ -292,7 +292,7 @@ export default function ListDetailPage() {
                 type="button"
                 onClick={() => void handleCreateCard()}
                 disabled={isCreating}
-                className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60"
+                className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60 dark:bg-white/10 dark:text-white"
               >
                 {isCreating ? "Opretter..." : "Opret opslag"}
               </button>

@@ -38,7 +38,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="min-h-screen bg-gradient-to-br from-rose-50 via-sky-50 to-blue-100 text-slate-900 font-sans">
+      <body className="min-h-screen bg-gradient-to-br from-rose-50 via-sky-50 to-blue-100 text-slate-900 font-sans dark:from-slate-950 dark:via-slate-900 dark:to-gray-900">
         <div className="min-h-screen pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
           {children}
         </div>

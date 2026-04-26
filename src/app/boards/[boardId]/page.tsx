@@ -106,29 +106,29 @@ export default function BoardDetailPage() {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/70 text-slate-700 shadow-sm backdrop-blur"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/70 text-slate-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
           aria-label="Tilbage"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Board</p>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Vælg person</h1>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-300">Board</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Vælg person</h1>
         </div>
       </header>
 
       <div className="min-h-0 flex-1">
         {isLoading ? (
           <div className="grid h-full grid-rows-2 gap-4">
-            <div className="animate-pulse rounded-[2rem] bg-white/70" />
-            <div className="animate-pulse rounded-[2rem] bg-white/70" />
+            <div className="animate-pulse rounded-[2rem] bg-white/70 dark:bg-white/10" />
+            <div className="animate-pulse rounded-[2rem] bg-white/70 dark:bg-white/10" />
           </div>
         ) : errorMessage ? (
-          <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700">
+          <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
             {errorMessage}
           </div>
         ) : displayLists.length === 0 ? (
-          <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700">
+          <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700 dark:border-white/10 dark:bg-neutral-800/60 dark:text-gray-300">
             Ingen kategorier fundet i denne tavle.
           </div>
         ) : (
@@ -152,10 +152,10 @@ export default function BoardDetailPage() {
                   className={`w-full rounded-[2rem] border border-white/70 bg-gradient-to-br ${tint} p-6 text-left shadow-md backdrop-blur-sm transition active:scale-[0.99] ${displayLists.length === 2 ? "h-full" : ""}`}
                 >
                   <div className="flex h-full flex-col justify-between">
-                    <p className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
+                    <p className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-4xl">
                       {list.name}
                     </p>
-                    <p className="mt-3 text-sm font-medium text-slate-600">Tryk for at åbne</p>
+                    <p className="mt-3 text-sm font-medium text-slate-600 dark:text-gray-400">Tryk for at åbne</p>
                   </div>
                 </button>
               );

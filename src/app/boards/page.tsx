@@ -66,22 +66,22 @@ export default function BoardsPage() {
   return (
     <main className="h-full overflow-y-auto px-4 pb-8 pt-6">
       <header className="mb-6">
-        <p className="text-sm font-medium text-slate-600">Opslagstavlen</p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dine Tavler</h1>
+        <p className="text-sm font-medium text-slate-600 dark:text-gray-400">Opslagstavlen</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Dine Tavler</h1>
       </header>
 
       {isLoading ? (
         <div className="space-y-3">
-          <div className="h-24 animate-pulse rounded-3xl bg-white/70" />
-          <div className="h-24 animate-pulse rounded-3xl bg-white/70" />
-          <div className="h-24 animate-pulse rounded-3xl bg-white/70" />
+          <div className="h-24 animate-pulse rounded-3xl bg-white/70 dark:bg-white/10" />
+          <div className="h-24 animate-pulse rounded-3xl bg-white/70 dark:bg-white/10" />
+          <div className="h-24 animate-pulse rounded-3xl bg-white/70 dark:bg-white/10" />
         </div>
       ) : errorMessage ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
           {errorMessage}
         </div>
       ) : boards.length === 0 ? (
-        <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700">
+        <div className="rounded-3xl border border-white/70 bg-white/70 p-5 text-sm text-slate-700 dark:border-white/10 dark:bg-neutral-800/60 dark:text-gray-300">
           Ingen tavler fundet endnu.
         </div>
       ) : (

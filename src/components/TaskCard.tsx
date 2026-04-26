@@ -242,14 +242,14 @@ export function TaskCard({
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
         onTouchCancel={onTouchCancel}
-        className="rounded-2xl border border-white/70 bg-white/75 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur-lg"
+        className="rounded-2xl border border-white/70 bg-white/75 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur-lg dark:border-white/10 dark:bg-neutral-800/60 dark:shadow-[0_10px_28px_rgba(0,0,0,0.24)]"
       >
         {assignedLabels.length > 0 ? (
           <div className="mb-3 flex flex-wrap gap-2">
             {assignedLabels.map((label) => (
               <span
                 key={label.id}
-                className="rounded-full border border-white/90 bg-violet-500/90 px-2.5 py-1 text-xs font-semibold backdrop-blur"
+                className="rounded-full border border-white/90 bg-[#4896ff] px-2.5 py-1 text-xs text-white font-semibold backdrop-blur dark:border-white/10 dark:bg-violet-500/75 dark:!text-white"
                 style={{ color: label.color }}
               >
                 {label.name}
@@ -259,19 +259,19 @@ export function TaskCard({
         ) : null}
 
         {formattedDueDate ? (
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-xs font-medium text-slate-600">
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-neutral-700 dark:text-gray-300">
             <CalendarDays className="h-3.5 w-3.5" />
             <span>{formattedDueDate}</span>
           </div>
         ) : null}
 
-        <p className="text-xl font-semibold tracking-tight text-gray-800">
+        <p className="text-xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
           {title || "Untitled task"}
         </p>
-        <p className="mt-2 whitespace-pre-wrap text-base leading-6 text-slate-600">
+        <p className="mt-2 whitespace-pre-wrap text-base leading-6 text-slate-600 dark:text-gray-400">
           {description || "Ingen beskrivelse"}
         </p>
-        <p className="mt-4 text-xs font-medium text-slate-400">
+        <p className="mt-4 text-xs font-medium text-slate-400 dark:text-gray-500">
           {readLabelName
             ? `Swipe højre for “${readLabelName}” · Hold nede for at redigere`
             : "Swipe højre for læst-label · Hold nede for at redigere"}
@@ -281,14 +281,14 @@ export function TaskCard({
       <AnimatePresence>
         {isEditOpen ? (
           <motion.div
-            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm dark:bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsEditOpen(false)}
           >
             <motion.div
-              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-3xl border border-white/60 bg-white/90 px-5 pb-8 pt-5 shadow-2xl backdrop-blur-xl"
+              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-3xl border border-white/60 bg-white/90 px-5 pb-8 pt-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/95"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -299,11 +299,11 @@ export function TaskCard({
               aria-label="Rediger opgave"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">Rediger opgave</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Rediger opgave</h2>
                 <button
                   type="button"
                   onClick={() => setIsEditOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-slate-700"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-slate-700 dark:border dark:border-white/10 dark:bg-neutral-700 dark:text-gray-300"
                   aria-label="Luk"
                 >
                   <X className="h-5 w-5" />
@@ -312,22 +312,22 @@ export function TaskCard({
 
               <div className="space-y-3">
                 <label className="block space-y-1.5">
-                  <span className="text-sm font-medium text-slate-700">Titel</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-gray-300">Titel</span>
                   <textarea
                     value={draftTitle}
                     onChange={(event) => setDraftTitle(event.target.value)}
                     rows={4}
-                    className="w-full min-h-[120px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-lg text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4"
+                    className="w-full min-h-[120px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-lg text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
                   />
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="text-sm font-medium text-slate-700">Beskrivelse</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-gray-300">Beskrivelse</span>
                   <textarea
                     value={draftDescription}
                     onChange={(event) => setDraftDescription(event.target.value)}
                     rows={7}
-                    className="w-full min-h-[160px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-base text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4"
+                    className="w-full min-h-[160px] resize-none rounded-2xl border border-white/60 bg-white/50 p-4 text-base text-slate-900 outline-none backdrop-blur ring-sky-300/70 transition focus:ring-4 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
                   />
                 </label>
               </div>
@@ -336,7 +336,7 @@ export function TaskCard({
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={isSaving}
-                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60"
+                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 text-base font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60 dark:bg-white/10 dark:text-white"
               >
                 <Check className="h-4 w-4" />
                 {isSaving ? "Gemmer..." : "Gem"}
@@ -346,7 +346,7 @@ export function TaskCard({
                 type="button"
                 onClick={() => void handleArchive()}
                 disabled={isSaving}
-                className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 text-base font-semibold text-rose-600 transition active:scale-[0.99] disabled:opacity-60"
+                className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 text-base font-semibold text-rose-600 transition active:scale-[0.99] disabled:opacity-60 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300"
               >
                 <Archive className="h-4 w-4" />
                 Arkivér
@@ -359,7 +359,7 @@ export function TaskCard({
       <AnimatePresence>
         {toastMessage ? (
           <motion.div
-            className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/70 bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg"
+            className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/70 bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg dark:border-white/10 dark:bg-neutral-700 dark:text-gray-100"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
