@@ -42,14 +42,12 @@ export interface Card {
   name: string;
   description?: string | null;
   dueDate?: string | null;
-  isArchived?: boolean;
   position: number;
   listId: string;
   boardId?: string;
   creatorUserId?: string;
   createdAt?: string;
   updatedAt?: string;
-  isSubscribed?: boolean;
 }
 
 export interface List {
@@ -87,10 +85,10 @@ export interface BoardPayload {
   cardLabels: CardLabel[];
 }
 
-export interface PlankaCollectionResponse<T> {
-  items: T[];
+export interface PlankaCollectionResponse {
+  items: unknown[];
 }
 
-export interface PlankaItemResponse<T> {
-  item: T;
+export interface PlankaItemResponse {
+  item: unknown;
 }

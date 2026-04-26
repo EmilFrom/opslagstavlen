@@ -176,7 +176,10 @@ export function TaskCard({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ isArchived: true }),
+        body: JSON.stringify({
+          boardId: card.boardId,
+          listId: "1753252979122635795",
+        }),
       });
 
       if (!response.ok) {

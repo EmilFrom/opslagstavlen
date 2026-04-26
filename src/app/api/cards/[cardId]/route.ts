@@ -4,12 +4,6 @@ import { NextResponse } from "next/server";
 const PLANKA_BASE_URL =
   process.env.PLANKA_BASE_URL ?? "https://tavlen.emilfrom.com";
 
-interface PatchCardBody {
-  name?: string;
-  description?: string;
-  isArchived?: boolean;
-}
-
 function getCardIdFromPath(pathname: string) {
   const parts = pathname.split("/").filter(Boolean);
   const cardsIndex = parts.lastIndexOf("cards");
@@ -34,29 +28,17 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Missing card id." }, { status: 400 });
   }
 
-  let body: PatchCardBody;
+  let payload: Record<string, unknown>;
 
   try {
-    body = (await request.json()) as PatchCardBody;
+    payload = (await request.json()) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const payloadBody: Record<string, string | boolean> = {};
-
-  if (typeof body.name === "string") {
-    payloadBody.name = body.name;
-  }
-
-  if (typeof body.description === "string") {
-    payloadBody.description = body.description;
-  }
-
-  if (typeof body.isArchived === "boolean") {
-    payloadBody.isArchived = body.isArchived;
-  }
-
   const plankaUrl = `${PLANKA_BASE_URL}/api/cards/${cardId}`;
+
+  console.log("[PROXY OUTGOING] PATCH", plankaUrl, payload);
 
   try {
     const response = await fetch(plankaUrl, {
@@ -66,15 +48,21 @@ export async function PATCH(request: NextRequest) {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payloadBody),
+      body: JSON.stringify(payload),
       cache: "no-store",
     });
 
-    const status = response.status;
     const rawText = await response.text();
 
+    console.log("[PROXY INCOMING] Status:", response.status, rawText);
+
     if (!response.ok) {
-      return NextResponse.json({ error: rawText }, { status });
+      return new NextResponse(rawText, {
+        status: response.status,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+      });
     }
 
     try {
