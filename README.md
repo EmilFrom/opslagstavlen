@@ -55,7 +55,7 @@ Når du har pushet til GitHub første gang, skal du gøre pakken offentlig:
     - **Value:** Emil's Pushover user key
     - **Name:** `PUSHOVER_USER_KEY_COLINE`
     - **Value:** Coline's Pushover user key
-   - Notifikation-routing er sat op til to brugere: Emil sender til Coline, og Coline sender til Emil.
+    - Notifikation-routing er sat op til to brugere: Emil sender til Coline, og Coline sender til Emil.
 
 4. Klik **Save** — appen starter automatisk.
 

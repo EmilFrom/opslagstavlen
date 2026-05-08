@@ -131,7 +131,8 @@ export function TaskCard({
     return true;
   });
 
-  const photoCountText = cardAttachments.length === 1 ? "1 foto" : `${cardAttachments.length} fotos`;
+  const photoCountLabel =
+    cardAttachments.length === 1 ? "1 foto" : `${cardAttachments.length} fotos`;
 
   const resolveAttachmentUrl = (attachment: CardAttachment) => {
     if (attachment.url) {
@@ -412,7 +413,7 @@ export function TaskCard({
             {PHOTO_UI.triggerLabel}
           </button>
           <span className="text-xs font-medium text-slate-400 dark:text-gray-500">
-            {photoCountText}
+            {photoCountLabel}
           </span>
         </div>
         <p className="mt-4 text-xs font-medium text-slate-400 dark:text-gray-500">
