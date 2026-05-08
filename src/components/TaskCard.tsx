@@ -148,7 +148,7 @@ export function TaskCard({
     }
 
     if (attachment.dirname && attachment.filename) {
-      return `${attachment.dirname}/${attachment.filename}`;
+      return `/api/attachments/${attachment.dirname}/${attachment.filename}`;
     }
 
     return "";
