@@ -1,34 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { decodeJwtPayload } from "@/lib/user";
+
 const PLANKA_BASE_URL =
   process.env.PLANKA_BASE_URL ?? "https://tavlen.emilfrom.com";
-
-interface JwtPayload {
-  id?: string;
-  userId?: string;
-  name?: string;
-  username?: string;
-  sub?: string;
-}
-
-function decodeJwtPayload(token: string): JwtPayload | null {
-  const parts = token.split(".");
-
-  if (parts.length < 2 || !parts[1]) {
-    return null;
-  }
-
-  try {
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-    const json = Buffer.from(padded, "base64").toString("utf-8");
-
-    return JSON.parse(json) as JwtPayload;
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("planka_jwt")?.value;

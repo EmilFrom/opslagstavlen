@@ -214,6 +214,8 @@ export default function ListDetailPage() {
         },
         body: JSON.stringify({
           message: `${senderDisplayName} har sendt dig en besked fra kategorien “${listName}”.`,
+          senderName: currentUserName,
+          senderUsername: currentUsername,
         }),
       });
 
