@@ -43,11 +43,25 @@ function toSupportedUser(value?: string): SupportedUser | null {
     return null;
   }
 
-  if (normalized === "emil" || normalized.includes("emil")) {
+  if (normalized === "emil") {
     return "emil";
   }
 
-  if (normalized === "coline" || normalized.includes("coline")) {
+  if (normalized === "coline") {
+    return "coline";
+  }
+
+  const tokens = normalized
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  if (tokens.includes("emil")) {
+    return "emil";
+  }
+
+  if (tokens.includes("coline")) {
     return "coline";
   }
 
