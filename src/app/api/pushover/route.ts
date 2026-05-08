@@ -1,70 +1,15 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json";
+import { toSupportedUser } from "@/lib/user";
 
-type SupportedUser = "emil" | "coline";
+const PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json";
 
 interface NotificationRequestBody {
   title?: string;
   message?: string;
-}
-
-function toSupportedUser(value?: string): SupportedUser | null {
-  const normalized = value?.trim().toLowerCase();
-
-  if (!normalized) {
-    return null;
-  }
-
-  if (normalized === "emil") {
-    return "emil";
-  }
-
-  if (normalized === "coline") {
-    return "coline";
-  }
-
-  const tokens = normalized
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .split(" ")
-    .filter(Boolean);
-
-  if (tokens.includes("emil")) {
-    return "emil";
-  }
-
-  if (tokens.includes("coline")) {
-    return "coline";
-  }
-
-  return null;
-}
-
-async function resolveCurrentUser(
-  request: NextRequest,
-  token: string,
-): Promise<SupportedUser | null> {
-  try {
-    const meUrl = new URL("/api/me", request.nextUrl.origin);
-    const meResponse = await fetch(meUrl, {
-      method: "GET",
-      headers: {
-        Cookie: `planka_jwt=${token}`,
-      },
-      cache: "no-store",
-    });
-
-    if (!meResponse.ok) {
-      return null;
-    }
-
-    const data = (await meResponse.json()) as { username?: string; name?: string };
-
-    return toSupportedUser(data.username) ?? toSupportedUser(data.name);
-  } catch {
-    return null;
-  }
+  senderName?: string;
+  senderUsername?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -74,7 +19,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const sender = await resolveCurrentUser(request, token);
+  let body: NotificationRequestBody = {};
+
+  try {
+    body = (await request.json()) as NotificationRequestBody;
+  } catch {
+    body = {};
+  }
+
+  const sender =
+    toSupportedUser(body.senderUsername) ?? toSupportedUser(body.senderName);
 
   if (!sender) {
     return NextResponse.json(
@@ -104,17 +58,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: NotificationRequestBody = {};
-
-  try {
-    body = (await request.json()) as NotificationRequestBody;
-  } catch {
-    body = {};
-  }
-
-  const senderName = sender === "emil" ? "Emil" : "Coline";
+  const senderDisplayName = sender === "emil" ? "Emil" : "Coline";
   const message =
-    body.message?.trim() || `${senderName} har sendt dig en notifikation fra Opslagstavlen.`;
+    body.message?.trim() || `${senderDisplayName} har sendt dig en notifikation fra Opslagstavlen.`;
 
   const formData = new URLSearchParams({
     token: appToken,
