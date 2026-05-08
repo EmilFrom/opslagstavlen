@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, Plus, X } from "lucide-react";
+import { BellRing, ChevronLeft, Plus, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -43,6 +43,9 @@ export default function ListDetailPage() {
   const [createError, setCreateError] = useState("");
   const [currentUserName, setCurrentUserName] = useState("");
   const [currentUsername, setCurrentUsername] = useState("");
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
+  const [notificationFeedback, setNotificationFeedback] = useState("");
+  const [isNotificationError, setIsNotificationError] = useState(false);
 
   const fetchBoardPayload = useCallback(async () => {
     if (!boardId || !listId) {
@@ -118,6 +121,19 @@ export default function ListDetailPage() {
     void fetchMe();
   }, []);
 
+  useEffect(() => {
+    if (!notificationFeedback) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setNotificationFeedback("");
+      setIsNotificationError(false);
+    }, 2500);
+
+    return () => clearTimeout(timeout);
+  }, [notificationFeedback]);
+
   const handleArchived = (cardId: string) => {
     setCards((prev) => prev.filter((card) => card.id !== cardId));
     setCardLabels((prev) => prev.filter((relation) => relation.cardId !== cardId));
@@ -171,6 +187,46 @@ export default function ListDetailPage() {
     }
   };
 
+  const handleSendNotification = async () => {
+    setIsSendingNotification(true);
+    setNotificationFeedback("");
+    setIsNotificationError(false);
+
+    try {
+      const response = await fetch("/api/pushover", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `${currentUserName || currentUsername || "Afsender"} har sendt dig en besked fra kategorien “${listName}”.`,
+        }),
+      });
+
+      const rawText = await response.text();
+      let data: { error?: string } | null = null;
+
+      try {
+        data = rawText ? (JSON.parse(rawText) as { error?: string }) : null;
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        setIsNotificationError(true);
+        setNotificationFeedback(data?.error ?? rawText ?? "Kunne ikke sende notifikation.");
+        return;
+      }
+
+      setNotificationFeedback("Notifikation sendt.");
+    } catch {
+      setIsNotificationError(true);
+      setNotificationFeedback("Netværksfejl. Prøv igen.");
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
   return (
     <main className="relative h-full overflow-y-auto px-2 pb-24 pt-5 sm:px-4 md:px-6">
       <header className="mb-6 flex items-center gap-3">
@@ -186,7 +242,29 @@ export default function ListDetailPage() {
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-300">Kategori</p>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{listName}</h1>
         </div>
+        <button
+          type="button"
+          onClick={() => void handleSendNotification()}
+          disabled={isSendingNotification}
+          className="ml-auto inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur transition active:scale-[0.99] disabled:opacity-60 dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
+          aria-label="Send notifikation til den anden bruger"
+        >
+          <BellRing className="h-4 w-4" />
+          {isSendingNotification ? "Sender..." : "Send notifikation"}
+        </button>
       </header>
+
+      {notificationFeedback ? (
+        <div
+          className={`mb-4 rounded-2xl border px-3 py-2 text-sm font-medium ${
+            isNotificationError
+              ? "border-rose-200 bg-rose-50/90 text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300"
+              : "border-emerald-200 bg-emerald-50/90 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
+          }`}
+        >
+          {notificationFeedback}
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="space-y-3">
