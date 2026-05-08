@@ -20,29 +20,34 @@ function getCardIdFromPath(pathname: string) {
 
 function parseAttachmentsFromRaw(rawText: string) {
   try {
-    const parsed = rawText ? (JSON.parse(rawText) as unknown) : null;
+    const parsed = rawText ? (JSON.parse(rawText) as any) : null;
+    console.log("[PROXY] Parsing attachments from raw JSON:", JSON.stringify(parsed, null, 2));
 
     if (Array.isArray(parsed)) {
       return parsed;
     }
 
-    if (parsed && typeof parsed === "object" && "items" in parsed && Array.isArray(parsed.items)) {
-      return parsed.items;
-    }
+    if (parsed && typeof parsed === "object") {
+      if ("items" in parsed && Array.isArray(parsed.items)) {
+        return parsed.items;
+      }
+      
+      if ("item" in parsed && parsed.item && typeof parsed.item === "object" && "attachments" in parsed.item && Array.isArray(parsed.item.attachments)) {
+         return parsed.item.attachments;
+      }
 
-    if (
-      parsed &&
-      typeof parsed === "object" &&
-      "included" in parsed &&
-      parsed.included &&
-      typeof parsed.included === "object" &&
-      "attachments" in parsed.included &&
-      Array.isArray(parsed.included.attachments)
-    ) {
-      return parsed.included.attachments;
+      if (
+        "included" in parsed &&
+        parsed.included &&
+        typeof parsed.included === "object" &&
+        "attachments" in parsed.included &&
+        Array.isArray(parsed.included.attachments)
+      ) {
+        return parsed.included.attachments;
+      }
     }
-  } catch {
-    // no-op
+  } catch (error) {
+    console.error("[PROXY] Failed to parse attachments JSON:", error);
   }
 
   return [];
@@ -71,6 +76,7 @@ export async function GET(request: NextRequest) {
     let lastStatus = 502;
 
     for (const endpoint of endpoints) {
+      console.log(`[PROXY] Fetching attachments from: ${endpoint}`);
       const response = await fetch(endpoint, {
         method: "GET",
         headers: {
@@ -81,9 +87,13 @@ export async function GET(request: NextRequest) {
       });
 
       const rawText = await response.text();
+      console.log(`[PROXY INCOMING] Status: ${response.status}, Length: ${rawText.length}`);
 
       if (response.ok) {
-        return NextResponse.json({ items: parseAttachmentsFromRaw(rawText) });
+        const items = parseAttachmentsFromRaw(rawText);
+        if (items.length > 0 || endpoint.includes("/attachments")) {
+            return NextResponse.json({ items });
+        }
       }
 
       lastError = rawText || lastError;
@@ -96,8 +106,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: lastError }, { status: lastStatus });
     }
 
-    return NextResponse.json({ error: lastError }, { status: lastStatus });
-  } catch {
+    return NextResponse.json({ items: [] });
+  } catch (error) {
+    console.error("[PROXY] Global error in attachments GET:", error);
     return NextResponse.json(
       { error: "Kunne ikke hente vedhæftninger lige nu." },
       { status: 500 },
@@ -148,6 +159,7 @@ export async function POST(request: NextRequest) {
       uploadData.append("name", fileName);
       uploadData.append(fileFieldName, file, fileName);
 
+      console.log(`[PROXY] Uploading to: ${endpoint} with field: ${fileFieldName}`);
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -159,6 +171,7 @@ export async function POST(request: NextRequest) {
       });
 
       const rawText = await response.text();
+      console.log(`[PROXY INCOMING] POST status: ${response.status}`);
 
       if (response.ok) {
         const items = parseAttachmentsFromRaw(rawText);
@@ -181,7 +194,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: lastError }, { status: lastStatus });
-  } catch {
+  } catch (error) {
+    console.error("[PROXY] Global error in attachments POST:", error);
     return NextResponse.json(
       { error: "Kunne ikke uploade billede lige nu." },
       { status: 500 },

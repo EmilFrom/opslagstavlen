@@ -139,12 +139,21 @@ export function TaskCard({
     cardAttachments.length === 1 ? "1 foto" : `${cardAttachments.length} fotos`;
 
   const resolveAttachmentUrl = (attachment: CardAttachment) => {
+    // Check various Planka attachment formats
     if (attachment.url) {
       return attachment.url;
     }
 
+    if (attachment.data?.url) {
+        return attachment.data.url;
+    }
+
     if (attachment.image?.url) {
       return attachment.image.url;
+    }
+
+    if (attachment.data?.image?.url) {
+        return attachment.data.image.url;
     }
 
     if (attachment.dirname && attachment.filename) {

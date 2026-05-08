@@ -60,6 +60,12 @@ export interface CardAttachment {
   image?: {
     url?: string;
   };
+  data?: {
+    url?: string;
+    image?: {
+      url?: string;
+    };
+  };
   createdAt?: string;
   updatedAt?: string;
 }
