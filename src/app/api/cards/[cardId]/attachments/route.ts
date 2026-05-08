@@ -5,6 +5,7 @@ const PLANKA_BASE_URL =
   process.env.PLANKA_BASE_URL ?? "https://tavlen.emilfrom.com";
 const UPLOAD_FIELD_NAMES = ["file", "image", "attachment"] as const;
 const ATTACHMENT_TYPE = "file";
+const ATTACHMENT_FALLBACK_NAME = "Vedhæftet fil";
 
 function getCardIdFromPath(pathname: string) {
   const parts = pathname.split("/").filter(Boolean);
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
     for (const fileFieldName of UPLOAD_FIELD_NAMES) {
       const uploadData = new FormData();
       uploadData.append("type", ATTACHMENT_TYPE);
-      uploadData.append("name", file.name || "Vedhæftet fil");
+      uploadData.append("name", file.name || ATTACHMENT_FALLBACK_NAME);
       uploadData.append(fileFieldName, file, file.name);
 
       const response = await fetch(endpoint, {
