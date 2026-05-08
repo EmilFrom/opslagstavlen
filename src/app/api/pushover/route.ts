@@ -1,39 +1,13 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PLANKA_BASE_URL =
-  process.env.PLANKA_BASE_URL ?? "https://tavlen.emilfrom.com";
 const PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json";
 
 type SupportedUser = "emil" | "coline";
 
-interface JwtPayload {
-  username?: string;
-  name?: string;
-  sub?: string;
-}
-
 interface NotificationRequestBody {
   title?: string;
   message?: string;
-}
-
-function decodeJwtPayload(token: string): JwtPayload | null {
-  const parts = token.split(".");
-
-  if (parts.length < 2 || !parts[1]) {
-    return null;
-  }
-
-  try {
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-    const json = Buffer.from(padded, "base64").toString("utf-8");
-
-    return JSON.parse(json) as JwtPayload;
-  } catch {
-    return null;
-  }
 }
 
 function toSupportedUser(value?: string): SupportedUser | null {
@@ -68,43 +42,27 @@ function toSupportedUser(value?: string): SupportedUser | null {
   return null;
 }
 
-async function resolveCurrentUser(token: string): Promise<SupportedUser | null> {
-  const decoded = decodeJwtPayload(token);
-
-  const fromToken =
-    toSupportedUser(decoded?.username) ??
-    toSupportedUser(decoded?.name) ??
-    toSupportedUser(decoded?.sub);
-
-  if (fromToken) {
-    return fromToken;
-  }
-
+async function resolveCurrentUser(
+  request: NextRequest,
+  token: string,
+): Promise<SupportedUser | null> {
   try {
-    const upstreamResponse = await fetch(`${PLANKA_BASE_URL}/api/users/me`, {
+    const meUrl = new URL("/api/me", request.nextUrl.origin);
+    const meResponse = await fetch(meUrl, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
+        Cookie: `planka_jwt=${token}`,
       },
       cache: "no-store",
     });
 
-    if (!upstreamResponse.ok) {
+    if (!meResponse.ok) {
       return null;
     }
 
-    const rawText = await upstreamResponse.text();
-    const data = rawText
-      ? (JSON.parse(rawText) as {
-          item?: {
-            username?: string;
-            name?: string;
-          };
-        })
-      : null;
+    const data = (await meResponse.json()) as { username?: string; name?: string };
 
-    return toSupportedUser(data?.item?.username) ?? toSupportedUser(data?.item?.name);
+    return toSupportedUser(data.username) ?? toSupportedUser(data.name);
   } catch {
     return null;
   }
@@ -117,7 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const sender = await resolveCurrentUser(token);
+  const sender = await resolveCurrentUser(request, token);
 
   if (!sender) {
     return NextResponse.json(
