@@ -51,11 +51,14 @@ Når du har pushet til GitHub første gang, skal du gøre pakken offentlig:
     - **Value:** `https://tavlen.emilfrom.com`
     - **Name:** `PUSHOVER_APP_TOKEN`
     - **Value:** dit Pushover app token
-    - **Name:** `PUSHOVER_USER_KEY_EMIL`
-    - **Value:** Emil's Pushover user key
-    - **Name:** `PUSHOVER_USER_KEY_COLINE`
-    - **Value:** Coline's Pushover user key
-    - Notifikation-routing er sat op til to brugere: Emil sender til Coline, og Coline sender til Emil.
+    - **Name:** `PUSHOVER_USER_KEY`
+    - **Value:** fælles Pushover user key
+    - **Name:** `PUSHOVER_DEVICE_EMIL`
+    - **Value:** Emil's device navn i Pushover (fx `iphone-emil`)
+    - **Name:** `PUSHOVER_DEVICE_COLINE`
+    - **Value:** Coline's device navn i Pushover (fx `droid4`)
+    - Notifikation-routing er sat op til to brugere: Emil sender til Coline-enheden, og Coline sender til Emil-enheden.
+    - Bagudkompatibilitet: `PUSHOVER_USER_KEY_EMIL` og `PUSHOVER_USER_KEY_COLINE` understøttes stadig, hvis `PUSHOVER_USER_KEY` ikke er sat.
 
 4. Klik **Save** — appen starter automatisk.
 

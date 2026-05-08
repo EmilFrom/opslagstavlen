@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 const PLANKA_BASE_URL =
   process.env.PLANKA_BASE_URL ?? "https://tavlen.emilfrom.com";
 const UPLOAD_FIELD_NAMES = ["file", "image", "attachment"] as const;
+const ATTACHMENT_TYPE = "file";
+const ATTACHMENT_FALLBACK_NAME = "Vedhæftet fil";
 
 function getCardIdFromPath(pathname: string) {
   const parts = pathname.split("/").filter(Boolean);
@@ -140,8 +142,11 @@ export async function POST(request: NextRequest) {
     let lastStatus = 502;
 
     for (const fileFieldName of UPLOAD_FIELD_NAMES) {
+      const fileName = file.name || ATTACHMENT_FALLBACK_NAME;
       const uploadData = new FormData();
-      uploadData.append(fileFieldName, file, file.name);
+      uploadData.append("type", ATTACHMENT_TYPE);
+      uploadData.append("name", fileName);
+      uploadData.append(fileFieldName, file, fileName);
 
       const response = await fetch(endpoint, {
         method: "POST",
