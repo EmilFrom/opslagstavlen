@@ -6,13 +6,20 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TaskCard } from "@/components/TaskCard";
-import type { Card, CardLabel, Label, List } from "@/types/planka";
+import type {
+  Card,
+  CardAttachment,
+  CardLabel,
+  Label,
+  List,
+} from "@/types/planka";
 
 type BoardPayloadResponse = {
   lists?: List[];
   cards?: Card[];
   labels?: Label[];
   cardLabels?: CardLabel[];
+  attachments?: CardAttachment[];
   error?: string;
 };
 
@@ -33,6 +40,7 @@ export default function ListDetailPage() {
   const [cards, setCards] = useState<Card[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
   const [cardLabels, setCardLabels] = useState<CardLabel[]>([]);
+  const [attachments, setAttachments] = useState<CardAttachment[]>([]);
   const [listName, setListName] = useState("Kategori");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -80,12 +88,14 @@ export default function ListDetailPage() {
         const filteredCards = allCards.filter((card) => card.listId === listId);
         const availableLabels = Array.isArray(data.labels) ? data.labels : [];
         const availableCardLabels = Array.isArray(data.cardLabels) ? data.cardLabels : [];
+        const availableAttachments = Array.isArray(data.attachments) ? data.attachments : [];
         const availableLists = Array.isArray(data.lists) ? data.lists : [];
         const selectedList = availableLists.find((list) => list.id === listId);
 
         setCards(filteredCards);
         setLabels(availableLabels);
         setCardLabels(availableCardLabels);
+        setAttachments(availableAttachments);
         setListName(selectedList?.name ?? "Kategori");
       } catch {
         setErrorMessage("Netværksfejl. Prøv igen.");
@@ -291,6 +301,7 @@ export default function ListDetailPage() {
               card={card}
               labels={labels}
               cardLabels={cardLabels}
+              attachments={attachments}
               currentUserName={currentUserName}
               currentUsername={currentUsername}
               onArchived={handleArchived}

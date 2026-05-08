@@ -83,7 +83,15 @@ export async function GET(request: NextRequest) {
           ? included.cardLabels
           : [];
 
-      return NextResponse.json({ lists, cards, labels, cardLabels }, { status: 200 });
+      const attachments =
+        included && "attachments" in included && Array.isArray(included.attachments)
+          ? included.attachments
+          : [];
+
+      return NextResponse.json(
+        { lists, cards, labels, cardLabels, attachments },
+        { status: 200 },
+      );
     } catch {
       return new NextResponse(rawText, {
         status: 502,

@@ -1,16 +1,28 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Archive, CalendarDays, Check, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Archive, CalendarDays, Check, Images, Upload, X } from "lucide-react";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { useLongPress } from "@/hooks/useLongPress";
-import type { Card, CardLabel, Label } from "@/types/planka";
+import type { Card, CardAttachment, CardLabel, Label } from "@/types/planka";
+
+const PHOTO_UI = {
+  triggerLabel: "Vedhæftede fotos",
+  uploadLabel: "Upload foto",
+  closeLabel: "Luk",
+  emptyState: "Ingen vedhæftede fotos endnu.",
+  fullscreenHint: "Tryk på billedet for fuld skærm",
+  galleryModalClass:
+    "absolute inset-x-0 bottom-0 mx-auto w-full max-w-md rounded-t-3xl border border-white/60 bg-white/90 px-5 pb-8 pt-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/95 md:max-w-2xl",
+  fullscreenOverlayClass: "fixed inset-0 z-[60] bg-black/85 p-4",
+};
 
 interface TaskCardProps {
   card: Card;
   labels: Label[];
   cardLabels: CardLabel[];
+  attachments?: CardAttachment[];
   currentUserName?: string;
   currentUsername?: string;
   onArchived?: (cardId: string) => void;
@@ -20,6 +32,7 @@ export function TaskCard({
   card,
   labels,
   cardLabels,
+  attachments = [],
   currentUserName,
   currentUsername,
   onArchived,
@@ -32,6 +45,13 @@ export function TaskCard({
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [optimisticLabelId, setOptimisticLabelId] = useState<string | null>(null);
+  const [isPhotosOpen, setIsPhotosOpen] = useState(false);
+  const [isPhotoFullscreenOpen, setIsPhotoFullscreenOpen] = useState(false);
+  const [activePhotoUrl, setActivePhotoUrl] = useState("");
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [uploadedAttachments, setUploadedAttachments] = useState<CardAttachment[]>([]);
+  const [fetchedAttachments, setFetchedAttachments] = useState<CardAttachment[] | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setTitle(card.name ?? "");
@@ -93,6 +113,46 @@ export function TaskCard({
 
     return `${userLabelCandidates[0]} har læst`;
   }, [userLabelCandidates]);
+
+  const attachmentSource = useMemo(() => {
+    if (fetchedAttachments) {
+      return fetchedAttachments;
+    }
+
+    return attachments.filter((attachment) => attachment.cardId === card.id);
+  }, [attachments, card.id, fetchedAttachments]);
+
+  const cardAttachments = useMemo(() => {
+    const merged = [...attachmentSource, ...uploadedAttachments];
+    const seen = new Set<string>();
+
+    return merged.filter((attachment) => {
+      const key = attachment.id || `${attachment.dirname ?? ""}/${attachment.filename ?? ""}`;
+
+      if (!key || seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }, [attachmentSource, uploadedAttachments]);
+
+  const resolveAttachmentUrl = (attachment: CardAttachment) => {
+    if (attachment.url) {
+      return attachment.url;
+    }
+
+    if (attachment.image?.url) {
+      return attachment.image.url;
+    }
+
+    if (attachment.dirname && attachment.filename) {
+      return `${attachment.dirname}/${attachment.filename}`;
+    }
+
+    return "";
+  };
 
   const formattedDueDate = useMemo(() => {
     if (!card.dueDate) {
@@ -228,6 +288,79 @@ export function TaskCard({
     }
   };
 
+  const openPhotoFullscreen = (url: string) => {
+    if (!url) {
+      return;
+    }
+
+    setActivePhotoUrl(url);
+    setIsPhotoFullscreenOpen(true);
+  };
+
+  const refreshAttachments = async () => {
+    try {
+      const response = await fetch(`/api/cards/${card.id}/attachments`, {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = (await response.json()) as { items?: CardAttachment[] };
+      setFetchedAttachments(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      // no-op
+    }
+  };
+
+  const handleUploadPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`/api/cards/${card.id}/attachments`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const rawText = await response.text();
+      let data: { item?: CardAttachment; error?: string } | null = null;
+
+      try {
+        data = rawText ? (JSON.parse(rawText) as { item?: CardAttachment; error?: string }) : null;
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        setToastMessage(data?.error ?? rawText ?? "Kunne ikke uploade foto");
+        return;
+      }
+
+      if (data?.item) {
+        setUploadedAttachments((prev) => [...prev, data.item as CardAttachment]);
+      }
+
+      await refreshAttachments();
+      setToastMessage("Foto vedhæftet");
+    } catch {
+      setToastMessage("Netværksfejl");
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
   return (
     <>
       <motion.div
@@ -271,6 +404,22 @@ export function TaskCard({
         <p className="mt-2 whitespace-pre-wrap text-base leading-6 text-slate-600 dark:text-gray-400">
           {description || "Ingen beskrivelse"}
         </p>
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setIsPhotosOpen(true);
+              void refreshAttachments();
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 transition active:scale-[0.99] dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
+          >
+            <Images className="h-3.5 w-3.5" />
+            {PHOTO_UI.triggerLabel}
+          </button>
+          <span className="text-xs font-medium text-slate-400 dark:text-gray-500">
+            {cardAttachments.length} foto
+          </span>
+        </div>
         <p className="mt-4 text-xs font-medium text-slate-400 dark:text-gray-500">
           {readLabelName
             ? `Swipe højre for “${readLabelName}” · Hold nede for at redigere`
@@ -352,6 +501,129 @@ export function TaskCard({
                 Arkivér
               </button>
             </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(event) => void handleUploadPhoto(event)}
+      />
+
+      <AnimatePresence>
+        {isPhotosOpen ? (
+          <motion.div
+            className="fixed inset-0 z-[55] bg-slate-900/50 backdrop-blur-sm dark:bg-black/70"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsPhotosOpen(false)}
+          >
+            <motion.div
+              className={PHOTO_UI.galleryModalClass}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Vedhæftede fotos"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                  {PHOTO_UI.triggerLabel}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsPhotosOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-slate-700 dark:border dark:border-white/10 dark:bg-neutral-700 dark:text-gray-300"
+                  aria-label={PHOTO_UI.closeLabel}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="mb-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 text-sm font-semibold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-60 dark:bg-white/10 dark:text-white"
+              >
+                <Upload className="h-4 w-4" />
+                {isUploadingPhoto ? "Uploader..." : PHOTO_UI.uploadLabel}
+              </button>
+
+              {cardAttachments.length === 0 ? (
+                <p className="rounded-2xl border border-white/60 bg-white/60 px-3 py-4 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-neutral-800/60 dark:text-gray-300">
+                  {PHOTO_UI.emptyState}
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {cardAttachments.map((attachment) => {
+                    const url = resolveAttachmentUrl(attachment);
+
+                    return (
+                      <button
+                        key={attachment.id}
+                        type="button"
+                        onClick={() => openPhotoFullscreen(url)}
+                        className="group relative aspect-square overflow-hidden rounded-2xl border border-white/70 bg-slate-200 dark:border-white/10 dark:bg-neutral-700"
+                        title={PHOTO_UI.fullscreenHint}
+                      >
+                        {url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={url}
+                            alt={attachment.name ?? "Vedhæftet foto"}
+                            className="h-full w-full object-cover transition group-active:scale-95"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs font-semibold text-slate-500 dark:text-gray-300">
+                            Uden preview
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isPhotoFullscreenOpen ? (
+          <motion.div
+            className={PHOTO_UI.fullscreenOverlayClass}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsPhotoFullscreenOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsPhotoFullscreenOpen(false)}
+              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white"
+              aria-label={PHOTO_UI.closeLabel}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="flex h-full items-center justify-center">
+              {activePhotoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={activePhotoUrl}
+                  alt="Vedhæftet foto i fuld skærm"
+                  className="max-h-full max-w-full rounded-2xl object-contain"
+                />
+              ) : null}
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
