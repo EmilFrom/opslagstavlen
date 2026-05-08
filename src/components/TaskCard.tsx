@@ -116,7 +116,7 @@ export function TaskCard({
 
   const baseAttachments = fetchedAttachments
     ? fetchedAttachments
-    : attachments.filter((attachment) => attachment.cardId === card.id);
+    : attachments.filter((attachment) => !attachment.cardId || attachment.cardId === card.id);
 
   const mergedAttachments = [...baseAttachments, ...uploadedAttachments];
   const seenAttachmentKeys = new Set<string>();
@@ -304,7 +304,7 @@ export function TaskCard({
     });
 
     if (!response.ok) {
-      throw new Error("Could not fetch attachments");
+      throw new Error("Kunne ikke hente vedhæftninger");
     }
 
     const data = (await response.json()) as { items?: CardAttachment[] };
