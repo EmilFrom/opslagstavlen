@@ -49,12 +49,12 @@ Når du har pushet til GitHub første gang, skal du gøre pakken offentlig:
 3. Scroll ned til **Environmental Variables** og tilføj:
     - **Name:** `PLANKA_BASE_URL`
     - **Value:** `https://tavlen.emilfrom.com`
-   - **Name:** `PUSHOVER_APP_TOKEN`
-   - **Value:** dit Pushover app token
-   - **Name:** `PUSHOVER_USER_KEY_EMIL`
-   - **Value:** Emil's Pushover user key
-   - **Name:** `PUSHOVER_USER_KEY_COLINE`
-   - **Value:** Coline's Pushover user key
+    - **Name:** `PUSHOVER_APP_TOKEN`
+    - **Value:** dit Pushover app token
+    - **Name:** `PUSHOVER_USER_KEY_EMIL`
+    - **Value:** Emil's Pushover user key
+    - **Name:** `PUSHOVER_USER_KEY_COLINE`
+    - **Value:** Coline's Pushover user key
 
 4. Klik **Save** — appen starter automatisk.
 

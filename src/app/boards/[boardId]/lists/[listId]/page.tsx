@@ -191,6 +191,10 @@ export default function ListDetailPage() {
     setIsSendingNotification(true);
     setNotificationFeedback("");
     setIsNotificationError(false);
+    const senderDisplayName =
+      [currentUserName, currentUsername]
+        .map((value) => value.trim())
+        .find((value) => Boolean(value)) ?? "Afsender";
 
     try {
       const response = await fetch("/api/pushover", {
@@ -199,7 +203,7 @@ export default function ListDetailPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: `${currentUserName || currentUsername || "Afsender"} har sendt dig en besked fra kategorien “${listName}”.`,
+          message: `${senderDisplayName} har sendt dig en besked fra kategorien “${listName}”.`,
         }),
       });
 

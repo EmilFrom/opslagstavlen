@@ -28,7 +28,6 @@ function toSupportedUser(value?: string): SupportedUser | null {
   const tokens = normalized
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .split(" ")
-    .map((token) => token.trim())
     .filter(Boolean);
 
   if (tokens.includes("emil")) {
