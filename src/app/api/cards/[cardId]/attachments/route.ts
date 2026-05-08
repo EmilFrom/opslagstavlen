@@ -142,10 +142,11 @@ export async function POST(request: NextRequest) {
     let lastStatus = 502;
 
     for (const fileFieldName of UPLOAD_FIELD_NAMES) {
+      const fileName = file.name || ATTACHMENT_FALLBACK_NAME;
       const uploadData = new FormData();
       uploadData.append("type", ATTACHMENT_TYPE);
-      uploadData.append("name", file.name || ATTACHMENT_FALLBACK_NAME);
-      uploadData.append(fileFieldName, file, file.name);
+      uploadData.append("name", fileName);
+      uploadData.append(fileFieldName, file, fileName);
 
       const response = await fetch(endpoint, {
         method: "POST",
