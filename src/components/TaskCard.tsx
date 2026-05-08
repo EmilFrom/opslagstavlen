@@ -318,6 +318,7 @@ export function TaskCard({
 
     const data = (await response.json()) as { items?: CardAttachment[] };
     setFetchedAttachments(Array.isArray(data.items) ? data.items : []);
+    setUploadedAttachments([]); 
   };
 
   const handleUploadPhoto = async (event: ChangeEvent<HTMLInputElement>) => {

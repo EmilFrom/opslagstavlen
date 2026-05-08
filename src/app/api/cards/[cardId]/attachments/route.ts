@@ -21,21 +21,23 @@ function getCardIdFromPath(pathname: string) {
 function parseAttachmentsFromRaw(rawText: string) {
   try {
     const parsed = rawText ? (JSON.parse(rawText) as any) : null;
-    console.log("[PROXY] Parsing attachments from raw JSON:", JSON.stringify(parsed, null, 2));
 
     if (Array.isArray(parsed)) {
       return parsed;
     }
 
     if (parsed && typeof parsed === "object") {
+      // Version 1: { items: [...] }
       if ("items" in parsed && Array.isArray(parsed.items)) {
         return parsed.items;
       }
       
+      // Version 2: { item: { attachments: [...] } }
       if ("item" in parsed && parsed.item && typeof parsed.item === "object" && "attachments" in parsed.item && Array.isArray(parsed.item.attachments)) {
          return parsed.item.attachments;
       }
 
+      // Version 3: { included: { attachments: [...] } }
       if (
         "included" in parsed &&
         parsed.included &&
@@ -74,6 +76,7 @@ export async function GET(request: NextRequest) {
   try {
     let lastError = "Kunne ikke hente vedhæftninger";
     let lastStatus = 502;
+    let allItems: any[] = [];
 
     for (const endpoint of endpoints) {
       console.log(`[PROXY] Fetching attachments from: ${endpoint}`);
@@ -87,25 +90,24 @@ export async function GET(request: NextRequest) {
       });
 
       const rawText = await response.text();
-      console.log(`[PROXY INCOMING] Status: ${response.status}, Length: ${rawText.length}`);
 
       if (response.ok) {
         const items = parseAttachmentsFromRaw(rawText);
-        if (items.length > 0 || endpoint.includes("/attachments")) {
-            return NextResponse.json({ items });
+        if (Array.isArray(items) && items.length > 0) {
+          return NextResponse.json({ items });
         }
+        // If we got an OK response but items is empty, we continue to the next endpoint
+      } else {
+          lastError = rawText || lastError;
+          lastStatus = response.status;
       }
-
-      lastError = rawText || lastError;
-      lastStatus = response.status;
 
       if (response.status === 404) {
         continue;
       }
-
-      return NextResponse.json({ error: lastError }, { status: lastStatus });
     }
 
+    // If we've tried all endpoints and still have no items, return empty list
     return NextResponse.json({ items: [] });
   } catch (error) {
     console.error("[PROXY] Global error in attachments GET:", error);
@@ -159,7 +161,6 @@ export async function POST(request: NextRequest) {
       uploadData.append("name", fileName);
       uploadData.append(fileFieldName, file, fileName);
 
-      console.log(`[PROXY] Uploading to: ${endpoint} with field: ${fileFieldName}`);
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -171,7 +172,6 @@ export async function POST(request: NextRequest) {
       });
 
       const rawText = await response.text();
-      console.log(`[PROXY INCOMING] POST status: ${response.status}`);
 
       if (response.ok) {
         const items = parseAttachmentsFromRaw(rawText);
