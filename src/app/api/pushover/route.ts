@@ -86,10 +86,16 @@ export async function POST(request: NextRequest) {
   const recipient = sender === "emil" ? "coline" : "emil";
 
   const appToken = process.env.PUSHOVER_APP_TOKEN;
+  const sharedUserKey = process.env.PUSHOVER_USER_KEY;
   const recipientUserKey =
-    recipient === "emil"
+    sharedUserKey ||
+    (recipient === "emil"
       ? process.env.PUSHOVER_USER_KEY_EMIL
-      : process.env.PUSHOVER_USER_KEY_COLINE;
+      : process.env.PUSHOVER_USER_KEY_COLINE);
+  const recipientDevice =
+    recipient === "emil"
+      ? process.env.PUSHOVER_DEVICE_EMIL
+      : process.env.PUSHOVER_DEVICE_COLINE;
 
   if (!appToken || !recipientUserKey) {
     return NextResponse.json(
@@ -116,6 +122,10 @@ export async function POST(request: NextRequest) {
     message,
     title: body.title?.trim() || "Opslagstavlen",
   });
+
+  if (recipientDevice?.trim()) {
+    formData.set("device", recipientDevice.trim());
+  }
 
   try {
     const pushoverResponse = await fetch(PUSHOVER_API_URL, {
