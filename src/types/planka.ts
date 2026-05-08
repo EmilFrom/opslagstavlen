@@ -50,6 +50,20 @@ export interface Card {
   updatedAt?: string;
 }
 
+export interface CardAttachment {
+  id: string;
+  cardId?: string;
+  name?: string;
+  dirname?: string;
+  filename?: string;
+  url?: string;
+  image?: {
+    url?: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface List {
   id: string;
   name: string;
@@ -83,6 +97,7 @@ export interface BoardPayload {
   cards: Card[];
   labels: Label[];
   cardLabels: CardLabel[];
+  attachments?: CardAttachment[];
 }
 
 export interface PlankaCollectionResponse {
