@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
   ];
 
   try {
-    let lastError = "Could not get attachments.";
+    let lastError = "Could not get attachments";
     let lastStatus = 502;
 
     for (const endpoint of endpoints) {
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
   const endpoint = `${PLANKA_BASE_URL}/api/cards/${cardId}/attachments`;
 
   try {
-    let lastError = "Could not upload image.";
+    let lastError = "Could not upload image";
     let lastStatus = 502;
 
     for (const fileFieldName of UPLOAD_FIELD_NAMES) {

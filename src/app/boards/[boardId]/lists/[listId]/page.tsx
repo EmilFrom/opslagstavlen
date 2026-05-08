@@ -204,7 +204,7 @@ export default function ListDetailPage() {
     const senderDisplayName =
       [currentUserName, currentUsername]
         .map((value) => value.trim())
-        .find((value) => Boolean(value)) ?? "Afsender";
+        .find((value) => Boolean(value)) ?? "Ukendt bruger";
 
     try {
       const response = await fetch("/api/pushover", {

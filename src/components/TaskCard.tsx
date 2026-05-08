@@ -114,14 +114,18 @@ export function TaskCard({
     return `${userLabelCandidates[0]} har læst`;
   }, [userLabelCandidates]);
 
-  const attachmentSource = fetchedAttachments
+  const baseAttachments = fetchedAttachments
     ? fetchedAttachments
     : attachments.filter((attachment) => attachment.cardId === card.id);
 
-  const mergedAttachments = [...attachmentSource, ...uploadedAttachments];
+  const mergedAttachments = [...baseAttachments, ...uploadedAttachments];
   const seenAttachmentKeys = new Set<string>();
-  const cardAttachments = mergedAttachments.filter((attachment) => {
-    const key = attachment.id || `${attachment.dirname ?? ""}/${attachment.filename ?? ""}`;
+  const cardAttachments = mergedAttachments.filter((attachment, index) => {
+    const key =
+      attachment.id ||
+      (attachment.dirname && attachment.filename
+        ? `${attachment.dirname}/${attachment.filename}`
+        : `attachment-${index}`);
 
     if (!key || seenAttachmentKeys.has(key)) {
       return false;
@@ -294,21 +298,17 @@ export function TaskCard({
   };
 
   const refreshAttachments = async () => {
-    try {
-      const response = await fetch(`/api/cards/${card.id}/attachments`, {
-        method: "GET",
-        cache: "no-store",
-      });
+    const response = await fetch(`/api/cards/${card.id}/attachments`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
-      if (!response.ok) {
-        return;
-      }
-
-      const data = (await response.json()) as { items?: CardAttachment[] };
-      setFetchedAttachments(Array.isArray(data.items) ? data.items : []);
-    } catch {
-      // no-op
+    if (!response.ok) {
+      throw new Error("Could not fetch attachments");
     }
+
+    const data = (await response.json()) as { items?: CardAttachment[] };
+    setFetchedAttachments(Array.isArray(data.items) ? data.items : []);
   };
 
   const handleUploadPhoto = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -405,7 +405,9 @@ export function TaskCard({
             type="button"
             onClick={() => {
               setIsPhotosOpen(true);
-              void refreshAttachments();
+              void refreshAttachments().catch(() => {
+                setToastMessage("Kunne ikke hente fotos");
+              });
             }}
             className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-700 transition active:scale-[0.99] dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
           >
