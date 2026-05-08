@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: lastError }, { status: lastStatus });
   } catch {
     return NextResponse.json(
-      { error: "Could not get attachments right now." },
+      { error: "Kunne ikke hente vedhæftninger lige nu." },
       { status: 500 },
     );
   }
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: lastError }, { status: lastStatus });
   } catch {
     return NextResponse.json(
-      { error: "Could not upload image right now." },
+      { error: "Kunne ikke uploade billede lige nu." },
       { status: 500 },
     );
   }
