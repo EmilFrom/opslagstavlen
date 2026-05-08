@@ -114,29 +114,24 @@ export function TaskCard({
     return `${userLabelCandidates[0]} har læst`;
   }, [userLabelCandidates]);
 
-  const attachmentSource = useMemo(() => {
-    if (fetchedAttachments) {
-      return fetchedAttachments;
+  const attachmentSource = fetchedAttachments
+    ? fetchedAttachments
+    : attachments.filter((attachment) => attachment.cardId === card.id);
+
+  const mergedAttachments = [...attachmentSource, ...uploadedAttachments];
+  const seenAttachmentKeys = new Set<string>();
+  const cardAttachments = mergedAttachments.filter((attachment) => {
+    const key = attachment.id || `${attachment.dirname ?? ""}/${attachment.filename ?? ""}`;
+
+    if (!key || seenAttachmentKeys.has(key)) {
+      return false;
     }
 
-    return attachments.filter((attachment) => attachment.cardId === card.id);
-  }, [attachments, card.id, fetchedAttachments]);
+    seenAttachmentKeys.add(key);
+    return true;
+  });
 
-  const cardAttachments = useMemo(() => {
-    const merged = [...attachmentSource, ...uploadedAttachments];
-    const seen = new Set<string>();
-
-    return merged.filter((attachment) => {
-      const key = attachment.id || `${attachment.dirname ?? ""}/${attachment.filename ?? ""}`;
-
-      if (!key || seen.has(key)) {
-        return false;
-      }
-
-      seen.add(key);
-      return true;
-    });
-  }, [attachmentSource, uploadedAttachments]);
+  const photoCountText = cardAttachments.length === 1 ? "1 foto" : `${cardAttachments.length} fotos`;
 
   const resolveAttachmentUrl = (attachment: CardAttachment) => {
     if (attachment.url) {
@@ -417,7 +412,7 @@ export function TaskCard({
             {PHOTO_UI.triggerLabel}
           </button>
           <span className="text-xs font-medium text-slate-400 dark:text-gray-500">
-            {cardAttachments.length} foto
+            {photoCountText}
           </span>
         </div>
         <p className="mt-4 text-xs font-medium text-slate-400 dark:text-gray-500">
