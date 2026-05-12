@@ -31,7 +31,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace("/boards/1753252978711594001");
+      router.replace("/boards");
       router.refresh();
     } catch {
       setErrorMessage("Netværksfejl. Prøv igen.");

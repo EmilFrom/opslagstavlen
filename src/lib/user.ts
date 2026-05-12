@@ -23,6 +23,10 @@ export function toSupportedUser(value?: string): SupportedUser | null {
     return "coline";
   }
 
+  if (normalized === "nicoline") {
+    return "coline";
+  }
+
   const tokens = normalized
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .split(" ")
@@ -33,6 +37,10 @@ export function toSupportedUser(value?: string): SupportedUser | null {
   }
 
   if (tokens.includes("coline")) {
+    return "coline";
+  }
+
+  if (tokens.includes("nicoline")) {
     return "coline";
   }
 

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { toSupportedUser } from "@/lib/user";
+import { decodeJwtPayload, toSupportedUser } from "@/lib/user";
 
 const PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json";
 
@@ -27,8 +27,12 @@ export async function POST(request: NextRequest) {
     body = {};
   }
 
+  const payload = decodeJwtPayload(token);
   const sender =
-    toSupportedUser(body.senderUsername) ?? toSupportedUser(body.senderName);
+    toSupportedUser(payload?.username) ??
+    toSupportedUser(payload?.name) ??
+    toSupportedUser(body.senderUsername) ??
+    toSupportedUser(body.senderName);
 
   if (!sender) {
     return NextResponse.json(

@@ -18,6 +18,13 @@ const TINTS = [
 
 export function BoardCard({ board, index }: BoardCardProps) {
   const tint = TINTS[index % TINTS.length];
+  const normalizedName = board.name.trim().toLowerCase();
+  const displayName =
+    normalizedName === "archive"
+      ? "Arkiv"
+      : normalizedName === "trash"
+        ? "Papirkurv"
+        : board.name;
 
   return (
     <Link
@@ -26,7 +33,7 @@ export function BoardCard({ board, index }: BoardCardProps) {
     >
       <div className="flex items-center justify-between gap-3">
         <h2 className="line-clamp-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-gray-200">
-          {board.name}
+          {displayName}
         </h2>
         <ChevronRight className="h-5 w-5 shrink-0 text-slate-600 transition group-hover:translate-x-0.5 dark:text-gray-400" />
       </div>
