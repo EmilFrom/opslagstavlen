@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { useMemo } from "react";
 
 import { getBoardDisplayName } from "@/lib/board";
 import type { Board } from "@/types/planka";
@@ -18,7 +19,7 @@ const TINTS = [
 ];
 export function BoardCard({ board, index }: BoardCardProps) {
   const tint = TINTS[index % TINTS.length];
-  const displayName = getBoardDisplayName(board.name);
+  const displayName = useMemo(() => getBoardDisplayName(board.name), [board.name]);
 
   return (
     <Link
