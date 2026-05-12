@@ -15,16 +15,15 @@ const TINTS = [
   "from-violet-100/90 to-indigo-100/70",
   "from-amber-100/90 to-orange-100/70",
 ];
+const BOARD_NAME_TRANSLATIONS: Record<string, string> = {
+  archive: "Arkiv",
+  trash: "Papirkurv",
+};
 
 export function BoardCard({ board, index }: BoardCardProps) {
   const tint = TINTS[index % TINTS.length];
   const normalizedName = board.name.trim().toLowerCase();
-  const displayName =
-    normalizedName === "archive"
-      ? "Arkiv"
-      : normalizedName === "trash"
-        ? "Papirkurv"
-        : board.name;
+  const displayName = BOARD_NAME_TRANSLATIONS[normalizedName] ?? board.name;
 
   return (
     <Link
