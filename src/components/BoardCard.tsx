@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
+import { getBoardDisplayName } from "@/lib/board";
 import type { Board } from "@/types/planka";
 
 interface BoardCardProps {
@@ -15,15 +16,9 @@ const TINTS = [
   "from-violet-100/90 to-indigo-100/70",
   "from-amber-100/90 to-orange-100/70",
 ];
-const BOARD_NAME_TRANSLATIONS: Record<string, string> = {
-  archive: "Arkiv",
-  trash: "Papirkurv",
-};
-
 export function BoardCard({ board, index }: BoardCardProps) {
   const tint = TINTS[index % TINTS.length];
-  const normalizedName = board.name.trim().toLowerCase();
-  const displayName = BOARD_NAME_TRANSLATIONS[normalizedName] ?? board.name;
+  const displayName = getBoardDisplayName(board.name);
 
   return (
     <Link

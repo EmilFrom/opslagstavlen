@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
   }
 
   const payload = decodeJwtPayload(token);
+  // Prefer identity from JWT over request body to avoid client-side name mismatches.
   const sender =
     toSupportedUser(payload?.username) ??
     toSupportedUser(payload?.name) ??
