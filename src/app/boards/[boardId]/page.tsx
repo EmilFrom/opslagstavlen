@@ -105,7 +105,7 @@ export default function BoardDetailPage() {
       <header className="mb-6 flex items-center gap-3">
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/boards")}
           className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/70 text-slate-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-neutral-700 dark:text-gray-200"
           aria-label="Tilbage"
         >

@@ -1,4 +1,6 @@
 export type SupportedUser = "emil" | "coline";
+// Planka displays the user as Nicoline while the username remains @coline.
+const COLINE_ALIASES = ["coline", "nicoline"] as const;
 
 export interface JwtPayload {
   id?: string;
@@ -19,7 +21,7 @@ export function toSupportedUser(value?: string): SupportedUser | null {
     return "emil";
   }
 
-  if (normalized === "coline") {
+  if (COLINE_ALIASES.includes(normalized as (typeof COLINE_ALIASES)[number])) {
     return "coline";
   }
 
@@ -32,7 +34,11 @@ export function toSupportedUser(value?: string): SupportedUser | null {
     return "emil";
   }
 
-  if (tokens.includes("coline")) {
+  if (
+    tokens.some((token) =>
+      COLINE_ALIASES.includes(token as (typeof COLINE_ALIASES)[number]),
+    )
+  ) {
     return "coline";
   }
 
